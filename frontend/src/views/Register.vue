@@ -45,7 +45,16 @@ const handleRegister = async () => {
     await authStore.register(email.value, username.value, password.value)
     toast.success('Registration successful! Logging you in...')
   } catch (e) {
-    toast.error('Registration failed. Username or Email might be taken.')
+    let msg = 'Registration failed'
+    if (e.response && e.response.data) {
+        // Flask-Security standard error format
+        if (e.response.data.response && e.response.data.response.errors) {
+            msg = e.response.data.response.errors[0]
+        } else if (e.response.data.message) {
+            msg = e.response.data.message
+        }
+    }
+    toast.error(msg)
   }
 }
 </script>

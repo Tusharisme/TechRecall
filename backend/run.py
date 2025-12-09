@@ -7,7 +7,7 @@ from flask_wtf.csrf import CSRFProtect
 from models import db, User, Role, Deck, Card, ReviewLog
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 csrf = CSRFProtect(app)
 
 # Database Config
