@@ -3,10 +3,12 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_security import Security, SQLAlchemyUserDatastore, auth_required, hash_password
+from flask_wtf.csrf import CSRFProtect
 from models import db, User, Role, Deck, Card, ReviewLog
 
 app = Flask(__name__)
 CORS(app)
+csrf = CSRFProtect(app)
 
 # Database Config
 basedir = os.path.abspath(os.path.dirname(__file__))
