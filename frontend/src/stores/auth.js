@@ -2,7 +2,18 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '../router'
 
-const API_URL = 'http://localhost:5000'
+import router from '../router'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+// Note: Backend routes are prefixed with /api, but Auth routes (/login, /register) are standard Flask-Security.
+// Wait, Flask-Security usually mounts on root. My run.py doesn't set prefix for security.
+// But my routes.py sets prefix /api.
+// So:
+// Auth: http://localhost:5000/login
+// API: http://localhost:5000/api/decks
+
+// Let's separate BASE_URL and API_URL
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -15,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(email, password) {
       try {
-        const response = await axios.post(`${API_URL}/login?include_auth_token`, {
+        const response = await axios.post(`${BASE_URL}/login?include_auth_token`, {
           email,
           password
         }, {

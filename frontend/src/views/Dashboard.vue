@@ -56,7 +56,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
-import axios from 'axios'
+import api from '../api'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
@@ -65,9 +65,7 @@ const decks = ref([])
 
 const fetchDecks = async () => {
     try {
-        const response = await axios.get('http://localhost:5000/api/decks', {
-          headers: { 'Authentication-Token': authStore.token } // Verify if needed, axios global set in store
-        })
+        const response = await api.get('/decks')
         decks.value = response.data
     } catch (e) {
         console.error(e)
@@ -78,7 +76,7 @@ const createDeck = async () => {
   const title = prompt("Enter deck title:")
   if (title) {
     try {
-       await axios.post('http://localhost:5000/api/decks', { title })
+       await api.post('/decks', { title })
        fetchDecks()
     } catch (e) {
       alert("Failed to create deck")

@@ -54,12 +54,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
-import { useAuthStore } from '../stores/auth'
+import api from '../api'
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
 
 const loading = ref(true)
 const cards = ref([])
@@ -75,32 +73,14 @@ const currentCard = computed(() => {
 
 const fetchCards = async () => {
   try {
-    // Actually we implemented /cards/due globally, but getting cards for specific deck
-    // requires logic update or filter. For now let's use global due endpoint and filter client side
-    // OR endpoints for deck cards. 
-    // Wait, the Algorithm runs on /cards/due endpoint which returns all due cards.
-    // If the user clicked "Study" on a specific deck, we should filter by deck_id.
-    
-    // Let's implement /decks/:id/cards (GET) to get ALL cards, but for Study Mode we want DUE cards.
-    // I will use /cards/due and filter by deck if needed.
-    // Ideally backend accepts ?deck_id param. But I didn't verify that.
-    // Let's fetch all due cards and filter client side for now.
-    
-    const response = await axios.get('http://localhost:5000/api/cards/due', {
-      headers: { 'Authentication-Token': authStore.token }
-    })
-    
-    // Filter by deckId from route
+    // Due cards logic
     const deckId = parseInt(route.params.id)
-    // The DUE endpoint returns: id, front, back, deck_title. It doesn't return deck_id.
-    // I need to update GET /cards/due to return deck_id.
-    // Or I can just fetch ALL cards for the deck and filter those where next_review <= now.
-    // Re-fetching deck cards is easier given current API limitations.
-    // Wait, get_cards endpoint returns 'next_review'. I can use that!
     
-    const deckCardsResponse = await axios.get(`http://localhost:5000/api/decks/${deckId}/cards`)
+    // Fetch all cards for this deck
+    const deckCardsResponse = await api.get(`/decks/${deckId}/cards`)
     const now = new Date().toISOString()
     
+    // Filter due cards
     cards.value = deckCardsResponse.data.filter(c => c.next_review <= now).sort((a,b) => a.next_review.localeCompare(b.next_review))
     
     loading.value = false
@@ -113,7 +93,7 @@ const fetchCards = async () => {
 const rateCard = async (rating) => {
   const card = currentCard.value
   try {
-    await axios.post(`http://localhost:5000/api/cards/${card.id}/review`, { rating })
+    await api.post(`/cards/${card.id}/review`, { rating })
     
     // Move to next
     isFlipped.value = false
