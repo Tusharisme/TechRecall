@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_security import auth_required, current_user
-from models import db, Deck, Card
+from models import db, Deck, Card, ReviewLog
 
 api = Blueprint('api', __name__)
 
