@@ -5,3 +5,6 @@ flask-migrate
 python-dotenv
 gunicorn
 psycopg2-binary
+flask-security-too
+bcrypt
+email-validator
