@@ -32,13 +32,7 @@ migrate = Migrate(app, db)
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
-# Create a user to test with
-def create_user():
-    with app.app_context():
-        db.create_all()
-        if not user_datastore.find_user(email="test@test.com"):
-            user_datastore.create_user(email="test@test.com", password=hash_password("password"), fs_uniquifier="1", username="tester")
-            db.session.commit()
+
 
 @app.route('/')
 def home():
@@ -56,6 +50,17 @@ def protected():
 from routes import api
 app.register_blueprint(api, url_prefix='/api')
 
+# Run creation logic once on startup (for both dev and prod)
+try:
+    with app.app_context():
+        # Ensure tables exist
+        db.create_all()
+        # Create test user if not exists
+        if not user_datastore.find_user(email="test@test.com"):
+            user_datastore.create_user(email="test@test.com", password=hash_password("password"), fs_uniquifier="1", username="tester")
+            db.session.commit()
+except Exception as e:
+    print(f"Startup Error: {e}")
+
 if __name__ == '__main__':
-    create_user()
     app.run(debug=True, port=5000)
