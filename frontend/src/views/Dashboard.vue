@@ -72,21 +72,26 @@ const decks = ref([])
 const toast = inject('toast')
 const heatmapData = ref([])
 
-const generateHeatmap = () => {
-    // Mock data for now as we didn't implement an API for "daily stats"
-    // Ideally: GET /api/stats/heatmap
-    // For MVP: Show empty/random or fetch logs if possible.
-    // Let's create last 60 days empty structure
-    const days = []
-    for (let i = 59; i >= 0; i--) {
-        const d = new Date()
-        d.setDate(d.getDate() - i)
-        days.push({
-            date: d.toISOString().split('T')[0],
-            count: Math.floor(Math.random() * 5) // Mocking random activity for demo "wow user"
-        })
+const generateHeatmap = async () => {
+    try {
+        const response = await api.get('/stats/heatmap')
+        const dataMap = new Map(response.data.map(d => [d.date, d.count]))
+        
+        // Generate last 60 days with real data or 0
+        const days = []
+        for (let i = 59; i >= 0; i--) {
+            const d = new Date()
+            d.setDate(d.getDate() - i)
+            const dateStr = d.toISOString().split('T')[0]
+            days.push({
+                date: dateStr,
+                count: dataMap.get(dateStr) || 0
+            })
+        }
+        heatmapData.value = days
+    } catch (e) {
+        console.error("Failed to load heatmap", e)
     }
-    heatmapData.value = days
 }
 
 const getColor = (count) => {
