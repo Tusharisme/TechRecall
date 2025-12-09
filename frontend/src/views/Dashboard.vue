@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, inject } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import api from '../api'
 import { useRouter } from 'vue-router'
@@ -62,12 +62,14 @@ import { useRouter } from 'vue-router'
 const authStore = useAuthStore()
 const router = useRouter()
 const decks = ref([])
+const toast = inject('toast')
 
 const fetchDecks = async () => {
     try {
         const response = await api.get('/decks')
         decks.value = response.data
     } catch (e) {
+        toast.error('Failed to load decks')
         console.error(e)
     }
 }
@@ -77,9 +79,10 @@ const createDeck = async () => {
   if (title) {
     try {
        await api.post('/decks', { title })
+       toast.success('Deck created!')
        fetchDecks()
     } catch (e) {
-      alert("Failed to create deck")
+      toast.error("Failed to create deck")
     }
   }
 }

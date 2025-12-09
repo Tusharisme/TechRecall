@@ -31,19 +31,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { useAuthStore } from '../stores/auth'
 
 const email = ref('')
 const username = ref('')
 const password = ref('')
 const authStore = useAuthStore()
+const toast = inject('toast')
 
 const handleRegister = async () => {
   try {
     await authStore.register(email.value, username.value, password.value)
+    toast.success('Registration successful! Logging you in...')
   } catch (e) {
-    alert('Registration failed')
+    toast.error('Registration failed. Username or Email might be taken.')
   }
 }
 </script>

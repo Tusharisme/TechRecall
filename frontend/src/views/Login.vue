@@ -28,18 +28,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { useAuthStore } from '../stores/auth'
 
 const email = ref('')
 const password = ref('')
 const authStore = useAuthStore()
+const toast = inject('toast')
 
 const handleLogin = async () => {
   try {
     await authStore.login(email.value, password.value)
+    toast.success('Welcome back!')
   } catch (e) {
-    alert('Login failed')
+    toast.error('Login failed. Please check your credentials.')
   }
 }
 </script>

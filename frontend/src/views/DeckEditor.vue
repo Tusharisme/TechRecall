@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../api'
 import { useAuthStore } from '../stores/auth'
@@ -53,6 +53,7 @@ import { useAuthStore } from '../stores/auth'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = inject('toast')
 
 const cards = ref([])
 const newCard = ref({ front: '', back: '' })
@@ -62,6 +63,7 @@ const fetchCards = async () => {
     const response = await api.get(`/decks/${route.params.id}/cards`)
     cards.value = response.data
   } catch (e) {
+    toast.error('Failed to load cards')
     console.error(e)
   }
 }
@@ -73,9 +75,10 @@ const addCard = async () => {
         back: newCard.value.back
     })
     newCard.value = { front: '', back: '' }
+    toast.success('Card added!')
     fetchCards()
   } catch (e) {
-    alert("Failed to add card")
+    toast.error("Failed to add card")
   }
 }
 
