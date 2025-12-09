@@ -32,12 +32,12 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 # Create a user to test with
-@app.before_first_request
 def create_user():
-    db.create_all()
-    if not user_datastore.find_user(email="test@test.com"):
-        user_datastore.create_user(email="test@test.com", password=hash_password("password"), fs_uniquifier="1", username="tester")
-        db.session.commit()
+    with app.app_context():
+        db.create_all()
+        if not user_datastore.find_user(email="test@test.com"):
+            user_datastore.create_user(email="test@test.com", password=hash_password("password"), fs_uniquifier="1", username="tester")
+            db.session.commit()
 
 @app.route('/')
 def home():
@@ -56,4 +56,5 @@ from routes import api
 app.register_blueprint(api, url_prefix='/api')
 
 if __name__ == '__main__':
+    create_user()
     app.run(debug=True, port=5000)
