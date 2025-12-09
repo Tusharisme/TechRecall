@@ -6,6 +6,6 @@ python-dotenv
 gunicorn
 psycopg2-binary
 flask-security-too
-bcrypt
+bcrypt==4.0.1
 email-validator
 Flask-WTF
