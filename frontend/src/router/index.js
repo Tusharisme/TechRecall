@@ -7,7 +7,8 @@ const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
-  { path: '/dashboard', name: 'Dashboard', component: () => import('../views/Dashboard.vue') } // Lazy load
+  { path: '/dashboard', name: 'Dashboard', component: () => import('../views/Dashboard.vue') },
+  { path: '/study/:id', name: 'Study', component: () => import('../views/StudyView.vue') }
 ]
 
 const router = createRouter({
