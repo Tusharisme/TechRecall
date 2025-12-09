@@ -131,7 +131,7 @@ def review_card(card_id):
             card.ease_factor = 1.3
     else:
         card.repetition = 0
-        card.interval = 1
+        card.interval = 0 # Review immediately
     
     from datetime import timedelta
     card.next_review = datetime.utcnow() + timedelta(days=card.interval)

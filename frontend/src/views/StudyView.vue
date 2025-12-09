@@ -6,7 +6,10 @@
          &larr; Back
       </button>
       <h1 class="text-xl font-bold text-gray-800">Study Session</h1>
-      <div class="w-10"></div>
+      <div class="flex items-center space-x-2">
+          <input type="checkbox" id="showAll" v-model="showAll" @change="fetchCards" class="rounded text-blue-600 focus:ring-blue-500">
+          <label for="showAll" class="text-sm text-gray-600 cursor-pointer">Study All</label>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -63,6 +66,7 @@ const loading = ref(true)
 const cards = ref([])
 const currentIndex = ref(0)
 const isFlipped = ref(false)
+const showAll = ref(false)
 
 const currentCard = computed(() => {
   if (currentIndex.value < cards.value.length) {
@@ -80,8 +84,12 @@ const fetchCards = async () => {
     const deckCardsResponse = await api.get(`/decks/${deckId}/cards`)
     const now = new Date().toISOString()
     
-    // Filter due cards
-    cards.value = deckCardsResponse.data.filter(c => c.next_review <= now).sort((a,b) => a.next_review.localeCompare(b.next_review))
+    // Filter due cards or show all
+    if (!showAll.value) {
+        cards.value = deckCardsResponse.data.filter(c => c.next_review <= now).sort((a,b) => a.next_review.localeCompare(b.next_review))
+    } else {
+        cards.value = deckCardsResponse.data
+    }
     
     loading.value = false
   } catch (e) {
