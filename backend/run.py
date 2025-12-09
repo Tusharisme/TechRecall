@@ -23,6 +23,7 @@ app.config['SECURITY_SEND_REGISTER_EMAIL'] = False # Disable for dev
 app.config['SECURITY_CSRF_PROTECT_MECHANISMS'] = []
 app.config['SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS'] = True
 app.config['WTF_CSRF_CHECK_DEFAULT'] = False
+app.config['SECURITY_USERNAME_ENABLE'] = True
 
 db.init_app(app)
 migrate = Migrate(app, db)
