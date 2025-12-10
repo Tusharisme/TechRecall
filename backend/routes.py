@@ -146,3 +146,25 @@ def review_card(card_id):
         "next_review": card.next_review.isoformat(),
         "interval": card.interval
     })
+
+@api.route('/stats/heatmap', methods=['GET'])
+@auth_required()
+def get_heatmap_data():
+    # Aggregate reviews by date for the current user
+    user_deck_ids = [d.id for d in current_user.decks]
+    
+    if not user_deck_ids:
+        return jsonify([])
+        
+    logs = ReviewLog.query.join(Card).filter(Card.deck_id.in_(user_deck_ids)).all()
+    
+    from collections import defaultdict
+    counts = defaultdict(int)
+    
+    for log in logs:
+        # Date only (YYYY-MM-DD)
+        date_str = log.reviewed_at.date().isoformat()
+        counts[date_str] += 1
+        
+    result = [{'date': k, 'count': v} for k, v in counts.items()]
+    return jsonify(result)
